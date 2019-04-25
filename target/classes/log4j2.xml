@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- log4j2 only use xml、json、yaml -->
+<!-- status has eight status: All<Trace<Debug<Info<Warn<error<fatal<Off -->
+<!-- monitorInterval  auto monitor interval(when the log4j2.xml changed):30s -->
+<configuration status="INFO" monitorInterval="30">
+	<properties>
+		<property name="LOG_HOME">E:/logs</property>
+		<property name="FILE_NAME">mylog</property>
+	</properties>
+	
+	<appenders>
+		<!-- 控制台设置 -->
+		<Console name="Console" target="SYSTEM_OUT">
+			<!-- 输出模式配置 -->
+			<PatternLayOut pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"></PatternLayOut>
+			
+			<!-- 日志级别过滤：设置固定的级别记录日志，其他的直接拒绝 -->
+			<ThresholdFilter level="warn" onMatch="ACCEPT" onMisMatch="DENY"></ThresholdFilter>
+		</Console>
+		
+		<!-- 输出到文件配置	FileName为输出文件的名字，其中${LOG_HOME}是在属性中配置的	filePattern文件如何存储，${date:yyyy-MM-dd_HH-mm-ss}表示打包的文件名，
+		如果不设置DefaultRolloverStrategy，默认打包七个log文件，当SizeBasedTriggeringPolicy太小时，日志文件保留最后生成的日志
+		如果filePattern打包的包名设置为${data:yyyy-MM}则以月进行打包，如果是${data:yyyy-MM-dd}则以日进行打包，一次类推
+		 -->
+		<RollingFile name="RollingFileInfo" FileName="${LOG_HOME}/info.log" filePattern="${LOG_HOME}/$${date:yyyy-MM-dd_HH-mm-ss}/info-%d{HH-mm-ss}-%i.log">
+			
+			<!-- 设置输出文件的日志格式 -->
+			<PatternLayOut pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"></PatternLayOut>
+			<policies>
+				<TimeBasedTriggeringPolicy></TimeBasedTriggeringPolicy>
+				<SizeBasedTriggeringPolicy size="5KB"></SizeBasedTriggeringPolicy>
+			</policies>
+			
+			<!-- 设置包中多少个文件，默认为7个 -->
+			<DefaultRolloverStrategy max="20">
+			</DefaultRolloverStrategy>
+		</RollingFile>
+	</appenders>
+	
+	<!-- 只有定义了loggers，appenders才会生效 -->
+	<loggers>
+		<!-- 日志根节点 -->
+		<root level="all">
+			
+			<!-- appender-ref是Root的子节点，用来指定该日志输出到哪个Appender -->
+			<appender-ref ref="Console"></appender-ref>
+			<appender-ref ref="RollingFileInfo"></appender-ref>
+		</root>
+		
+		<!-- 指定包下的类设置单独的日志等级级别 -->
+		<logger level="warn" name="com.jdsn.loggertest">
+			<appender-ref ref="Console"></appender-ref>
+		</logger>
+	</loggers>
+</configuration>
